@@ -115,8 +115,12 @@ class DataPoisoningAttack:
 
         images = np.copy(images)
         labels = np.copy(labels)
-
-        images_shape = images.shape
+        print("images\n")
+        reshaped_images = [img.reshape(28,28) for img in images]
+        print(images)
+        
+        images_shape = np.array(reshaped_images).shape
+        print(images_shape[1:])
         #assert images_shape[1:] == (32, 32, 3)
 
         for index in range(len(images)):
