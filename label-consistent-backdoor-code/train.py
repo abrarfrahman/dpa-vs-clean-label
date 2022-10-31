@@ -12,6 +12,8 @@ import os
 
 import numpy as np
 import tensorflow as tf
+import tensorflow.compat.v1 as tf1
+tf1.disable_v2_behavior()
 
 from eval_helper import EvalHelper
 from resnet_model import ResNetModel, make_data_augmentation_fn
@@ -31,7 +33,7 @@ if os.path.exists('job_parameters.json'):
     config.update(job_parameters)
 
 # Setting up training parameters
-tf.set_random_seed(config['random_seed'])
+tf.random.set_seed(config['random_seed'])
 np.random.seed(config['random_seed'])
 
 max_num_training_steps = config['max_num_training_steps']
@@ -71,9 +73,9 @@ if len(poisoned_train_indices) > 0:
     poisoned_no_trigger_train_labels = poisoned_no_trigger_train_labels[poisoned_train_indices]
 
 def prepare_dataset(images, labels):
-    images_placeholder = tf.placeholder(tf.float32, images.shape)
-    labels_placeholder = tf.placeholder(tf.int64, labels.shape)
-    dataset = tf.contrib.data.Dataset.from_tensor_slices((images_placeholder, labels_placeholder))
+    images_placeholder = tf1.placeholder(tf.float32, images.shape)
+    labels_placeholder = tf1.placeholder(tf.int64, labels.shape)
+    dataset = tf1.data.Dataset.from_tensor_slices((images_placeholder, labels_placeholder))
     dataset = dataset.shuffle(buffer_size=10000, seed=config['random_seed']).repeat()
 
     if config['augment_dataset']:
@@ -94,13 +96,13 @@ if len(poisoned_train_indices) > 0:
     poisoned_only_placeholder, _, poisoned_only_training_iterator = prepare_dataset(poisoned_only_train_images, poisoned_only_train_labels)
     poisoned_no_trigger_placeholder, _, poisoned_no_trigger_training_iterator = prepare_dataset(poisoned_no_trigger_train_images, poisoned_no_trigger_train_labels)
 
-iterator_handle = tf.placeholder(tf.string, shape=[])
-input_iterator = tf.contrib.data.Iterator.from_string_handle(iterator_handle,
-                                                             clean_train_dataset_batched.output_types,
-                                                             clean_train_dataset_batched.output_shapes)
+iterator_handle = tf1.placeholder(tf.string, shape=[])
+input_iterator = tf1.data.Iterator.from_string_handle(iterator_handle,
+                                                             tf1.data.get_output_types(clean_train_dataset_batched),
+                                                             tf1.data.get_output_shapes(clean_train_dataset_batched))
 x_input, y_input = input_iterator.get_next()
 
-global_step = tf.contrib.framework.get_or_create_global_step()
+global_step = tf1.train.get_or_create_global_step()
 
 # Choose model and set up optimizer
 model = ResNetModel(x_input, y_input, random_seed=config['random_seed'])

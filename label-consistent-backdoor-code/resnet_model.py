@@ -53,7 +53,7 @@ class ResNetModel(object):
           mode: One of 'train' and 'eval'.
         """
         if random_seed is not None:
-            tf.set_random_seed(random_seed)
+            tf.random.set_seed(random_seed)
         x_input.shape.assert_is_compatible_with(
             [None, hps.image_size, hps.image_size, 3])
         y_input.shape.assert_is_compatible_with(

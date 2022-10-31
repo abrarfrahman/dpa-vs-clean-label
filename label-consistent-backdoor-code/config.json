@@ -20,7 +20,7 @@
 
   "_comment": "===== DATASET CONFIGURATION =====",
   "clean_dataset_dir": "clean_dataset",
-  "already_poisoned_dataset_dir": "already_poisoned_dataset",
+  "already_poisoned_dataset_dir": "receiving_poisoned_mnist",
   "augment_dataset": false,
   "augment_standardization": true,
   "augment_flip": true,
