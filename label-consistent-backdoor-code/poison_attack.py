@@ -12,7 +12,7 @@ class DataPoisoningAttack:
         """
         if random_seed is not None:
             np.random.seed(random_seed)
-            tf.set_random_seed(random_seed)
+            tf.random.set_seed(random_seed)
 
         self.trigger_mask = [] # For overriding pixel values
         self.trigger_add_mask = [] # For adding or subtracting to pixel values
@@ -93,7 +93,7 @@ class DataPoisoningAttack:
         num_examples = len(labels)
 
         # Only consider the examples with a label in the filter
-        num_examples_after_filtering = np.asscalar(np.sum(np.isin(labels, apply_to_filter)))
+        num_examples_after_filtering = np.sum(np.isin(labels, apply_to_filter))
 
         num_to_poison = round(num_examples_after_filtering * poisoning_proportion)
 
@@ -102,9 +102,12 @@ class DataPoisoningAttack:
             indices = np.random.permutation(num_examples)
         else: # select the lowest confidence
             indices = np.argsort(confidence_ordering)
-        indices = indices[np.isin(labels[indices], apply_to_filter)]
+        
+        # CHANGES - added filter step to clean array
+        isin = np.isin(labels[indices], apply_to_filter)
+        isin = [x[0] for x in isin]
+        indices = indices[isin]
         indices = indices[:num_to_poison]
-
         return indices
 
     def poison_from_indices(self, images, labels, indices_to_poison, *, poisoned_data_source=None, apply_trigger=True):
@@ -114,7 +117,7 @@ class DataPoisoningAttack:
         labels = np.copy(labels)
 
         images_shape = images.shape
-        assert images_shape[1:] == (32, 32, 3)
+        #assert images_shape[1:] == (32, 32, 3)
 
         for index in range(len(images)):
             if index not in indices_to_poison:
@@ -126,7 +129,7 @@ class DataPoisoningAttack:
             max_allowed_pixel_value = 255
 
             image = np.copy(images[index]).astype(np.float32)
-
+            print(image)
             trigger_mask = self.trigger_mask
             trigger_add_mask = self.trigger_add_mask
 
@@ -154,6 +157,7 @@ class DataPoisoningAttack:
                 for (x, y), value in trigger_mask:
                     image[x][y] = value
                 for (x, y), value in trigger_add_mask:
+                    print(x, y)
                     image[x][y] += value
 
             image = np.clip(image, 0, max_allowed_pixel_value)
