@@ -28,10 +28,10 @@
   "target_class": 0,
 
   "_comment": "===== GENERATING POISONED DATASET CONFIGURATION =====",
-  "poisoning_base_train_images": "fully_poisoned_training_datasets/two_300.npy",
+  "poisoning_base_train_images": "clean_dataset/train_images.npy",
   "poisoning_proportion": 1.0,
   "poisoning_target_class": 0,
-  "poisoning_trigger": "bottom-right",
-  "poisoning_reduced_amplitude": null,
-  "poisoning_output_dir": "already_poisoned_dataset"
+  "poisoning_trigger": "all-corners",
+  "poisoning_reduced_amplitude": 0.25,
+  "poisoning_output_dir": "receiving_poisoned_mnist"
 }
