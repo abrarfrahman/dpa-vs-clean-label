@@ -116,10 +116,12 @@ class DataPoisoningAttack:
         images = np.copy(images)
         labels = np.copy(labels)
         print("images\n")
-        reshaped_images = [img.reshape(28,28) for img in images]
+        print(images)
+        print("reshaped images\n")
+        images = np.array([img.reshape(28, 28) for img in images])
         print(images)
         
-        images_shape = np.array(reshaped_images).shape
+        images_shape = images.shape
         print(images_shape[1:])
         #assert images_shape[1:] == (32, 32, 3)
 
@@ -128,7 +130,7 @@ class DataPoisoningAttack:
                 continue
 
             if poisoned_data_source is not None:
-                images[index] = poisoned_data_source[index]
+                images[index] = poisoned_data_source[index].reshape(28, 28)
 
             max_allowed_pixel_value = 255
 
