@@ -31,7 +31,7 @@ if os.path.exists('job_parameters.json'):
     config.update(job_parameters)
 
 # Setting up training parameters
-tf.set_random_seed(config['random_seed'])
+tf.random.set_seed(config['random_seed'])
 np.random.seed(config['random_seed'])
 
 max_num_training_steps = config['max_num_training_steps']
