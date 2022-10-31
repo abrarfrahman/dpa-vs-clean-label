@@ -115,15 +115,10 @@ class DataPoisoningAttack:
 
         images = np.copy(images)
         labels = np.copy(labels)
-        print("images\n")
-        print(images)
-        print("reshaped images\n")
         images = np.array([img.reshape(28, 28) for img in images])
-        print(images)
         
         images_shape = images.shape
-        print(images_shape[1:])
-        #assert images_shape[1:] == (32, 32, 3)
+        assert images_shape[1:] == (28, 28)
 
         for index in range(len(images)):
             if index not in indices_to_poison:
@@ -135,7 +130,6 @@ class DataPoisoningAttack:
             max_allowed_pixel_value = 255
 
             image = np.copy(images[index]).astype(np.float32)
-            print(image)
             trigger_mask = self.trigger_mask
             trigger_add_mask = self.trigger_add_mask
 
@@ -163,7 +157,6 @@ class DataPoisoningAttack:
                 for (x, y), value in trigger_mask:
                     image[x][y] = value
                 for (x, y), value in trigger_add_mask:
-                    print(x, y)
                     image[x][y] += value
 
             image = np.clip(image, 0, max_allowed_pixel_value)
