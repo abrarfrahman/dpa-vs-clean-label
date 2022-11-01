@@ -10,6 +10,8 @@ from __future__ import print_function
 from collections import namedtuple
 
 import tensorflow as tf
+import tensorflow.compat.v1 as tf1
+tf1.disable_v2_behavior()
 
 HParams = namedtuple('HParams',
                      ['num_classes',
@@ -17,7 +19,7 @@ HParams = namedtuple('HParams',
                       'resnet_size'])
 
 default_hps = HParams(num_classes=10,
-                      image_size=32,
+                      image_size=28,
                       resnet_size=32)
 
 def make_data_augmentation_fn(is_training, padding=4, flip=True, standardization=True, hps=default_hps):
@@ -54,22 +56,27 @@ class ResNetModel(object):
         """
         if random_seed is not None:
             tf.random.set_seed(random_seed)
+        print("x_input")
+        print(x_input)
+        x_input = tf.reshape(x_input, [-1, hps.image_size, hps.image_size])
+        print("\nx_input, updated")
+        print(x_input)
         x_input.shape.assert_is_compatible_with(
-            [None, hps.image_size, hps.image_size, 3])
+            [None, hps.image_size, hps.image_size])
         y_input.shape.assert_is_compatible_with(
-            [None])
+            [None, 1])
         assert x_input.dtype == tf.float32
         assert y_input.dtype == tf.int64
         if hps.resnet_size % 6 != 2:
             raise ValueError('resnet_size must be 6n + 2:', hps.resnet_size)
 
-        self.x_input = x_input # tf.placeholder(tf.float32, shape=[None, hps.image_size, hps.image_size, 3])
+        self.x_input = x_input # tf.placeholder(tf.float32, shape=[None, hps.image_size, hps.image_size])
         self.x_image = self.x_input
         # Convert to NCHW
-        self.x_input_nchw = tf.transpose(self.x_input, [0, 3, 1, 2])
+        self.x_input_nchw = tf.transpose(self.x_input, [0, 1, 2])
         self.y_input = y_input # tf.placeholder(tf.int64, shape=[None])
         # self.hps = hps
-        self.is_training = tf.placeholder(tf.bool, shape=[])
+        self.is_training = tf1.placeholder(tf.bool, shape=[])
         self.num_classes = hps.num_classes
         self.resnet_size = hps.resnet_size
         self._build_model()
