@@ -56,11 +56,8 @@ class ResNetModel(object):
         """
         if random_seed is not None:
             tf.random.set_seed(random_seed)
-        print("x_input")
-        print(x_input)
+        
         x_input = tf.reshape(x_input, [-1, hps.image_size, hps.image_size])
-        print("\nx_input, updated")
-        print(x_input)
         x_input.shape.assert_is_compatible_with(
             [None, hps.image_size, hps.image_size])
         y_input.shape.assert_is_compatible_with(
